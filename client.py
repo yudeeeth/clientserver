@@ -3,7 +3,7 @@ import threading
 
 class clientobj():
     def __init__(self, header = 64, port = 8080, encoding = 'utf-8' ):
-        self._serverip = "127.0.1.1"
+        self._serverip = self.getserverip()
         self._header = header
         self._port = port
         self._encoding = encoding
@@ -18,6 +18,13 @@ class clientobj():
     def __del__(self):
         if self.connected:
             self.sendmessage(self._DISCONNECT_MESSAGE)
+    
+    def getserverip(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        SERVER = s.getsockname()[0]
+        s.close()
+        return SERVER
 
     def startclient(self):
         print("Starting chat app")
@@ -32,8 +39,6 @@ class clientobj():
                 self.connected = False
             else:
                 self.sendmessage(msg)
-
-
 
     def recievemessage(self):
         while self.connected:
@@ -55,7 +60,4 @@ class clientobj():
         self.client.send(message)
     
 c = clientobj()
-c.startclient()
-
-
-            
+c.startclient()     

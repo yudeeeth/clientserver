@@ -4,7 +4,8 @@ import sqlite3
 
 class serverobj():
     def __init__(self, header = 64, port = 8080, encoding = 'utf-8' ):
-        self._serverip = socket.gethostbyname(socket.gethostname())
+        #self._serverip = socket.gethostbyname(socket.gethostname())
+        self._serverip = self.getserverip()
         self._header = header
         self._port = port
         self._encoding = encoding
@@ -21,6 +22,13 @@ class serverobj():
         c = conn.cursor()
         c.execute('DELETE FROM chats WHERE user="[server]"')
         conn.close()
+
+    def getserverip(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        SERVER = s.getsockname()[0]
+        s.close()
+        return SERVER
 
     def startserver(self):
         print(f"[Server ip:{self._serverip} listening at port:{self._port}]")

@@ -77,8 +77,9 @@ class serverobj():
         c = conn.cursor()
         c.execute("SELECT serial from chats ORDER BY serial DESC LIMIT 1")
         s = c.fetchone()
-        integ = int(s[0])
+        
         if s:
+            integ = int(s[0])
             print(f"current serial number : {integ + 1}")
             return integ+1
         else:

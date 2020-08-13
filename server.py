@@ -15,13 +15,12 @@ class serverobj():
         self._RECIEVEDSUCCESSFULLY = "sjduyhgvkcsueyfvskeufjdghvskehdgsdfdvuehfg"
         self.currentserialnumber = int(self.getcurser())
 
-    # def __del__(self):
-    #     self.cursor.execute("INSERT INTO chats VALUES (?,?,?)",(self.currentserialnumber,"[server]","Server Turning off"))
-    #     #self._dbconn.commit()
-    #     #self.update_all()
-    #     self.cursor.execute('DELETE FROM chats WHERE user="[server]"')
-    #     #self._dbconn.commit()
-    #     self._dbconn.close()
+    def __del__(self):
+        self.addtodata("[server]","Server killed")
+        conn = sqlite3.connect('messages.db')
+        c = conn.cursor()
+        c.execute('DELETE FROM chats WHERE user="[server]"')
+        conn.close()
 
     def startserver(self):
         print(f"[Server ip:{self._serverip} listening at port:{self._port}]")

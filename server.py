@@ -15,6 +15,7 @@ class serverobj():
         self._DISCONNECT_MESSAGE = "kawudhvcjsfuhvslfroyivedfegeqsfvfggffgr"
         self._RECIEVEDSUCCESSFULLY = "sjduyhgvkcsueyfvskeufjdghvskehdgsdfdvuehfg"
         self.currentserialnumber = int(self.getcurser())
+        self.stop_command = "puter stop"
 
     def __del__(self):
         self.addtodata("[server]","Server killed")
@@ -34,15 +35,24 @@ class serverobj():
         print(f"[Server ip:{self._serverip} listening at port:{self._port}]")
         self.server.listen()
         self.conn_list = []
-        while True:
+        start = True
+        while start:
             conn, addr = self.server.accept()
-            threadhandlecli = threading.Thread(target= self.HandleClient,args=(conn, addr))
+            msg_length = conn.recv(self._header).decode(self._encoding)
+            username='buffer'
+            if msg_length:
+                msg_length = int(msg_length)
+                msg = conn.recv(msg_length).decode(self._encoding)
+                username = msg
+                if username == self.stop_command:
+                    start = False
+            threadhandlecli = threading.Thread(target= self.HandleClient,args=(conn, addr,username))
             threadhandlecli.start()
             self.conn_list.append( conn  )
             print(f"Active connections {threading.activeCount()-1}")
 
-    def HandleClient(self,conn,addr):
-        print(f"[New Connection {addr}]")
+    def HandleClient(self,conn,addr,username):
+        print(f"[New Connection {addr}{username}]")
         connected = True
         while connected:
             msg_length = conn.recv(self._header).decode(self._encoding)
@@ -50,13 +60,14 @@ class serverobj():
                 msg_length = int(msg_length)
                 msg = conn.recv(msg_length).decode(self._encoding)
                 if msg == self._DISCONNECT_MESSAGE:
+                    self.messagesend(conn,"Disconnected from server")
                     connected = False
                     self.conn_list.remove( conn  )
-                    print(f"[Connection severed {addr}]")
+                    print(f"[Connection severed {username}]")
                     print(f"Active connections {threading.activeCount() - 2}")
                 else:
-                    print(f"[{addr}]: {msg}")
-                    self.addtodata(addr,msg)
+                    print(f"[{username}]: {msg}")
+                    self.addtodata(username,msg)
                 #self.messagesend(conn , self._RECIEVEDSUCCESSFULLY) 
 
     def update_all(self):

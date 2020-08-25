@@ -51,12 +51,12 @@ Please do read the last secction for some drawbacks in this code.
 - [x] A troop leader can send messages to everyone in his own troop, as well as see messages from other troop leaders.
 - [x] The chief commander can see all messages but he should only be able to communicate directly with the troop leaders.
 - [x] The whole model will be based on groups, so you will be required to create groups to maintain the communication protocols.**_(again, does have groups, but my communication protocol isnt based on groups)_**
-- [ ] Dockerize the CLI.
+- [x] Dockerize the CLI.
 #### Hacker Mode
 - [x] Each client should be able to keep a record of his chat history over the past one week, and he would be able to download it in the form of a text file whenever he wants.
 - [x] If any of the client is offline, the server should store messages along with the username of the recipient and send the messages to the client as soon as he is online, rather than giving an error message.
 - [x] If a client receives a message, he should receive it with the name of the sender along with it. If the client sends a message, his own name should be printed along with the message on his own screen as given below.Army1: Hello guys, how are you doing? Army2: I am fine, what about you? Army3 (me): I am also fine.**_(Didnt use buffers for this, but didnt notice issues when )_**
-- [ ] Finally, dockerize the whole application along with the client side database. You should learn Docker Compose for this.
+- [x] Finally, dockerize the whole application along with the client side database. You should learn Docker Compose for this.
 
 ### where my code is inefficient or downright stupid
 

@@ -40,7 +40,8 @@
 
 ### My thoughts
 I started out from a video on youtube on websockets using python. So my was similar to their's at the beginning.
-But that video only had code to send data to the server, everything else was built upon by me. Ofc changing ip for the cliennt is stupid, but i havent thougt of a workaround for it yet.
+But that video only had code to send data to the server, everything else was built upon by me. Ofc changing ip for the client is stupid, but i havent thought of a workaround for it yet.
+Please do read the last secction for some drawbacks in this code.
 
 ### Task checklist
 #### MainTask

@@ -56,4 +56,10 @@ But that video only had code to send data to the server, everything else was bui
 - [x] If a client receives a message, he should receive it with the name of the sender along with it. If the client sends a message, his own name should be printed along with the message on his own screen as given below.Army1: Hello guys, how are you doing? Army2: I am fine, what about you? Army3 (me): I am also fine.
 - [ ] Finally, dockerize the whole application along with the client side database. You should learn Docker Compose for this.
 
-### where my code is inefficient
+### where my code is inefficient or downright stupid
+
+1. If a new message is recieved while one is typing a message, the typed message will be taken out of buffer, and hence has to be retyped.
+2. One has to change the ip address present in the client program everytime, because the local ip given to server changes everytime server is run.
+3. No way to stop the server from inside the server(have to use a special account to shut down server)
+4. Code is not clean as can be, in a few places the code has multiple if conditions to catch edge cases which could have been removed if *see the next point*
+5. Only strings are transfered thru the sockets and are printed as is without parsing. This and the previous point could have been avoided by passing serialised objects through the socket. But since this project was simple enough, i thought i could handle it with just strings. Which i did, at the expanse of code readability.

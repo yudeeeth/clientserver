@@ -8,7 +8,7 @@ class clientobj():
         if len(sys.argv) == 2:
             self._serverip = sys.argv[1]
         else:
-            self._serverip = "192.168.0.105"
+            self._serverip = "172.17.0.1"
         print(self._serverip)
         self._header = header
         self._port = port
@@ -28,9 +28,9 @@ class clientobj():
         self.eli = '\x1b[2K'
         self.name = "jsfhgvsikfhjdvsbfkfivhsbfolibkvjsbfvikh"
 
-    def __del__(self):
-        if self.connected:
-            self.sendmessage(self._DISCONNECT_MESSAGE)
+    #def __del__(self):
+     #   if self.connected:
+      #      self.sendmessage(self._DISCONNECT_MESSAGE)
     
     def getserverip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

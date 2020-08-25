@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  server:
+    image: server
+    ports:
+      - "3000:3000"
+  client:
+    image: client
+    stdin_open: true
+    tty: true
+    ports:
+      - "3001:3001"
+    depends_on:
+      - server
+    
+        

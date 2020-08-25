@@ -4,8 +4,8 @@ import sys
 import sqlite3
 
 class clientobj():
-    def __init__(self, header = 64, port = 8080, encoding = 'utf-8' ):
-        self._serverip = "192.168.0.101"
+    def __init__(self, header = 64, port = 3000, encoding = 'utf-8' ):
+        self._serverip = "192.168.0.105"
         print(self._serverip)
         self._header = header
         self._port = port
@@ -15,16 +15,19 @@ class clientobj():
         self.client.connect(self._addr)
         self._DISCONNECT_MESSAGE = "kawudhvcjsfuhvslfroyivedfegeqsfvfggffgr"
         self._changegroup = "sjduyhgvkcsueyfvskeufjdghvskehdgsdfdvuehfg"
+        self._downloadchat = "jytghdciyjhmgcgddikjhfgvkjjitgjdhfoewihigqer"
         self.messbuff = []
         self.connected = True
         self.printmess = True
+        self.download = False
         self.num_mes_recv=0
         self.Cup = '\x1b[1A'
         self.eli = '\x1b[2K'
+        self.name = "jsfhgvsikfhjdvsbfkfivhsbfolibkvjsbfvikh"
 
-    # def __del__(self):
-    #     if self.connected:
-    #         self.sendmessage(self._DISCONNECT_MESSAGE)
+    def __del__(self):
+        if self.connected:
+            self.sendmessage(self._DISCONNECT_MESSAGE)
     
     def getserverip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -50,6 +53,10 @@ class clientobj():
             if msg == "logmeout":
                 self.connected = False
                 self.sendmessage(self._DISCONNECT_MESSAGE)
+            elif msg == ":d":
+                self.sendmessage(self._downloadchat)
+                print("Enter filename to save to(with extension)")
+                self.name = input() #input messing with sendmessage input
             else:
                 self.sendmessage(msg)
         #stop threads
@@ -61,17 +68,39 @@ class clientobj():
             if msg_length:
                 msg_length = int(msg_length)
                 msg = self.client.recv(msg_length).decode(self._encoding)
-                if ":" in msg:
-                    if self.printmess == True:
-                        
+                if msg == self._changegroup:
+                    self.delallmes()
+                elif msg == self._downloadchat:
+                    self.download = not self.download
+                    self.downloadtofile(self._downloadchat)
+                else:
+                    if self.downloadtofile(msg):
+                        pass
+                    elif self.printmess == True:
                         print(r'{}'.format(msg))
                     else:
                         while self.printmess == False:
                             pass
                         print(r'{}'.format(msg))
-                else:
-                    if msg == self._changegroup:
-                        self.delallmes()
+
+    def downloadtofile(self, msg):
+        if msg == self._downloadchat:
+            if self.download:
+                while self.name == "jsfhgvsikfhjdvsbfkfivhsbfolibkvjsbfvikh":
+                    pass
+                self.fp = open(f"{self.name}",'w')
+            else:
+                self.fp.close()
+                print(f"File saved as {self.name}")
+                self.num_mes_recv+=3
+                #close file
+        else:
+            try:
+                self.fp.write(msg)
+            except:
+                pass
+            #addmess to file
+            return self.download
 
     def delallmes(self):
         while self.num_mes_recv>0:
@@ -80,6 +109,7 @@ class clientobj():
             sys.stdout.write(self.eli)
             self.printmess = True
             self.num_mes_recv -= 1
+        print("[recieve string started]")
 
     def sendmessage(self,msg):
         message = msg.encode(self._encoding)

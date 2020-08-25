@@ -3,7 +3,7 @@ import threading
 import sqlite3
 
 class serverobj():
-    def __init__(self, header = 64, port = 8080, encoding = 'utf-8' ):
+    def __init__(self, header = 64, port = 3000, encoding = 'utf-8' ):
         #self._serverip = socket.gethostbyname(socket.gethostname())
         self._serverip = self.getserverip()
         self._header = header
@@ -14,6 +14,7 @@ class serverobj():
         self.server.bind(self._addr)
         self._DISCONNECT_MESSAGE = "kawudhvcjsfuhvslfroyivedfegeqsfvfggffgr"
         self._changegroup = "sjduyhgvkcsueyfvskeufjdghvskehdgsdfdvuehfg"
+        self._downloadchat = "jytghdciyjhmgcgddikjhfgvkjjitgjdhfoewihigqer"
         self.currentserialnumber = int(self.getcurser())
         self.stop_command = "puter stop"
 
@@ -78,13 +79,25 @@ class serverobj():
                     #message to delete all recv messages
                     self.sendbulk(conn,username,group)
                     #self.addtodata(username,msg,group)
+                elif msg == self._downloadchat:
+                    self.messagesend(conn,self._downloadchat)
+                    self.prepquerynsend(username,group,conn)
                 elif username=="Chiefcommander" and group !="h":
-                    self.messagesend(conn,'Chiefcommander can NOT send messages to troops direcctly. \n Sendng message to troop leaders without changing group...')
-                    
+                    self.messagesend(conn,'Chiefcommander can NOT send messages to troops direcctly. Sendng message to troop leaders without changing group...')
+                    self.addtodata(username,msg,'h')
                 else:
                     print(r"[{}@{}]: {}".format(username,group,msg))
                     self.addtodata(username,msg,group)
                 #self.messagesend(conn , self._RECIEVEDSUCCESSFULLY) 
+
+    def prepquerynsend(self, username, group, conn):
+        con = sqlite3.connect('messages.db')
+        c = con.cursor()
+        c.execute(f"SELECT user,grp,date, time, msg from chats where date > (select date('now','-7 day')) and grp like '%{group}%' order by serial")
+        var = c.fetchall()
+        for row in var:
+            self.messagesend(conn,f"[{row[2]} {row[3]}]{row[0]}:{row[4]}\n")
+        self.messagesend(conn,self._downloadchat)
 
     def findgrpnhange(self,username, group):
         for i in self.conn_list:
@@ -156,7 +169,7 @@ class serverobj():
     def getdate(self):
         conn = sqlite3.connect('messages.db')
         c = conn.cursor()
-        c.execute("select datetime('now')")
+        c.execute("select date('now')")
         time = c.fetchone()
         return time[0]
 

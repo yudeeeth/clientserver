@@ -37,7 +37,7 @@ class clientobj():
         return SERVER
 
     def startclient(self):
-        print("Starting chat app")
+        print("Starting chat app, type :help and enter to get help regarding commands")
         username=input('[enter username]\n')
         self.sendmessage(username)
         thread = threading.Thread(target=self.recievemessage, args=())
@@ -57,6 +57,11 @@ class clientobj():
                 self.sendmessage(self._downloadchat)
                 print("Enter filename to save to(with extension)")
                 self.name = input() #input messing with sendmessage input
+            elif msg == ":help":
+                fn = open('info.txt','r')
+                len = self.file_len('info.txt')
+                self.num_mes_recv += len
+                print(fn.read())
             else:
                 self.sendmessage(msg)
         #stop threads
@@ -118,6 +123,12 @@ class clientobj():
         send_length += b' ' * (self._header - len(send_length))
         self.client.send(send_length)
         self.client.send(message)
+
+    def file_len(self,fname):
+        with open(fname) as f:
+            for i, l in enumerate(f):
+                pass
+        return i + 2
     
 c = clientobj()
 c.startclient()     

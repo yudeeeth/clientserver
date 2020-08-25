@@ -5,7 +5,10 @@ import sqlite3
 
 class clientobj():
     def __init__(self, header = 64, port = 3000, encoding = 'utf-8' ):
-        self._serverip = "192.168.0.105"
+        if len(sys.argv) == 2:
+            self._serverip = sys.argv[1]
+        else:
+            self._serverip = "192.168.0.105"
         print(self._serverip)
         self._header = header
         self._port = port

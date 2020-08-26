@@ -28,10 +28,6 @@ class clientobj():
         self.eli = '\x1b[2K'
         self.name = "jsfhgvsikfhjdvsbfkfivhsbfolibkvjsbfvikh"
 
-    #def __del__(self):
-     #   if self.connected:
-      #      self.sendmessage(self._DISCONNECT_MESSAGE)
-    
     def getserverip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))

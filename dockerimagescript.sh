@@ -6,7 +6,7 @@ docker build . -t client
 
 mv Dockerfile Dockerfileclient
 
-mv Dockerfileserver Dockefile
+mv Dockerfileserver Dockerfile
 
 docker build . -t server
 

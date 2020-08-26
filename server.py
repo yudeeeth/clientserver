@@ -18,6 +18,7 @@ class serverobj():
         self.currentserialnumber = int(self.getcurser())
         self.stop_command = "puter stop"
 
+    #destructor which does nothin coz its almost never called or something
     def __del__(self):
         self.addtodata("[server]","Server killed",'h')
         conn = sqlite3.connect('messages.db')
@@ -26,6 +27,7 @@ class serverobj():
         conn.commit()
         conn.close()
 
+    
     def getserverip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
@@ -190,7 +192,7 @@ class serverobj():
             return 'n'
         elif 'AirForce' in username:
             return 'a'
-    def command(self,msg, username,group):
+    def command(self, msg, username,group):
         lis = ['ArmyGeneral','NavyMarshal','AirForceChief','yudeeeth','puter stop']
         lis2 = [':H',':R',':N',':A',':h',':r',':n',':a']
         if username in lis:

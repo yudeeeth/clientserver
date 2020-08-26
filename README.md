@@ -1,11 +1,20 @@
 # clientserver
 ### Tl;dr
+#### Without Docker
 1. Run server.py either in the background or foreground.(stay connected to wifi please)
 2. Copy the ip address shown by server.py and use it as an argument when calling client.py (or you can set a default value by editing the file)
 3. Run the any number of client.py files from any device in the same network, and voila you can send texts to groups now.
 4. commands are typed just like normal messages. 
 5. Type :help and enter to display list of commands and descriptions. This command will display the following in the terminal
    
+#### With Docker
+1. Run dockerimagescript.sh after chmod-ing it.
+ > chmod +x dockerimagescript.sh
+ > ./dockerimagescript.sh
+ 
+2. Run 
+ > docker exec -it sockets_client_1 /bin/bash
+### Commands Inside Program
    ##### Chiefcomander can shift to any group he wants using the following commands:
    
       > :h 
@@ -47,7 +56,7 @@ Anyway. for now I ve written a script to install the right images with right nam
  then run,
  > python3.6 client.py
  
- voila, ssh into this container as many times as you want and it will be a different client.
+ voila, ssh into this container as many times as you want and it will be a different client. This will  only work if these are the only runnign conatiners, else you will have to pass the server ip as mentioned below as an argument.
  
  If you want to run the client image on your own, not the one already running,(again, why?) you can run, it make sure its connected to the same network(which it will be by default), and find the server's container ip by using 
  > docker inspect container-name 
@@ -77,7 +86,7 @@ Please do read the last secction for some drawbacks in this code.
 ### where my code is inefficient or downright stupid
 
 1. If a new message is recieved while one is typing a message, the typed message will be taken out of buffer, and hence has to be retyped.
-2. One has to change the ip address present in the client program everytime, because the local ip given to server changes everytime server is run.
+2. One has to change the ip address present in the client program everytime, because the local ip given to server changes everytime server is run.(Incase of dockers, ip will change if more containers are running before using docker compose)
 3. No way to stop the server from inside the server(have to use a special account to shut down server)
 4. Code is not clean as can be, in a few places the code has multiple if conditions to catch edge cases which could have been removed if *see the next point*
 5. Only strings are transfered thru the sockets and are printed as is without parsing. This and the previous point could have been avoided by passing serialised objects through the socket. But since this project was simple enough, i thought i could handle it with just strings. Which i did, at the expanse of code readability.

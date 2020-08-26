@@ -38,15 +38,17 @@ class clientobj():
     #starts the connection
     def startclient(self):
         print("Starting chat app, type :help and enter to get help regarding commands")
-        k = ['Chiefcommander','ArmyGeneral','NavyMarshal', 'AirForceChief','puter stop']
+        userlist = ['Chiefcommander','ArmyGeneral','NavyMarshal', 'AirForceChief','puter stop']
         #checks if username is allowed
-        if getpass.getuser() in k:
+        if getpass.getuser() in userlist:
             username = getpass.getuser()
             #code to get usename using getpass
-        elif self.otheruser():
+        elif self.otheruser(getpass.getuser()):
             username = getpass.getuser()
         else:
             username=input('[enter username(because you werent part of predefined users)]\n')
+            while not self.otheruser(username) and username not in userlist: 
+                username=input('[enter username(because you werent part of predefined users)]\n')
             #asks username if no match found
         #first message to be sent is the username(in my custom protocol)
         self.sendmessage(username)
@@ -83,8 +85,7 @@ class clientobj():
         #stop threads
 
     #checks if username valid
-    def otheruser(self):
-        name = getpass.getuser()
+    def otheruser(self,name):
         flag=False
         for i in range(50):
             if name in [f"Army{i+1}",f"AirForce{i+1}",f"Navy{i+1}"]:

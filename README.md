@@ -1,5 +1,7 @@
 # clientserver
 ### Tl;dr
+##### If your username isn't recognised as possible, it will ask you to type in
+For ease during development and testing
 #### Without Docker
 1. Run server.py either in the background or foreground.(stay connected to wifi please)
 2. Copy the ip address shown by server.py and use it as an argument when calling client.py (or you can set a default value by editing the file)

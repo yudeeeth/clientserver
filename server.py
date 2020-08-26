@@ -5,18 +5,23 @@ import sqlite3
 class serverobj():
     def __init__(self, header = 64, port = 3000, encoding = 'utf-8' ):
         #self._serverip = socket.gethostbyname(socket.gethostname())
+        #setup netwrok variables
         self._serverip = self.getserverip()
         self._header = header
         self._port = port
         self._encoding = encoding
         self._addr = (self._serverip, self._port)
+        #binding to port
         self.server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.server.bind(self._addr)
+        #special messages
         self._DISCONNECT_MESSAGE = "kawudhvcjsfuhvslfroyivedfegeqsfvfggffgr"
         self._changegroup = "sjduyhgvkcsueyfvskeufjdghvskehdgsdfdvuehfg"
         self._downloadchat = "jytghdciyjhmgcgddikjhfgvkjjitgjdhfoewihigqer"
+        #get the last entry number in db
         self.currentserialnumber = int(self.getcurser())
         self.stop_command = "puter stop"
+        #special message to sotp server from outside
 
     #destructor which does nothin coz its almost never called or something
     def __del__(self):
@@ -27,8 +32,8 @@ class serverobj():
         conn.commit()
         conn.close()
 
-    
     def getserverip(self):
+        #dns ping to get system/server ipv4 as seen by router
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
         SERVER = s.getsockname()[0]
@@ -36,8 +41,10 @@ class serverobj():
         return SERVER
 
     def startserver(self):
+        #starts listening to requests
         print(f"[Server ip:{self._serverip} listening at port:{self._port}]")
         self.server.listen()
+        #list to keep track of connection objects and correspodign usernames
         self.conn_list = []
         start = True
         while start:
@@ -57,6 +64,7 @@ class serverobj():
             print(f"Active connections {threading.activeCount()-1}")
 
     def HandleClient(self,conn,addr,username,group):
+        #thead function to handle each client
         print(f"[New Connection {addr}{username}]")
         connected = True
         self.sendbulk(conn,username,group)
@@ -65,6 +73,7 @@ class serverobj():
             if msg_length:
                 msg_length = int(msg_length)
                 msg = conn.recv(msg_length).decode(self._encoding)
+                #checking is messages are commands or normal messages
                 if msg == self._DISCONNECT_MESSAGE:
                     self.messagesend(conn,"Disconnected from server")
                     connected = False
@@ -74,10 +83,13 @@ class serverobj():
                     print(f"[Connection severed {username}]")
                     print(f"Active connections {threading.activeCount() - 2}")
                 elif self.command(msg,username,group):
+                    #check if the command exists and is permissable for current user
                     group = self.changegrp(msg,group,username)
+                    #change the string stored in group to current group
+                    #and make these changes in the conn_list array
                     self.findgrpnhange(username,group)
                     #send change group command to client
-                    self.messagesend(conn,"sjduyhgvkcsueyfvskeufjdghvskehdgsdfdvuehfg")
+                    self.messagesend(conn,self._changegroup)
                     #message to delete all recv messages
                     self.sendbulk(conn,username,group)
                     #self.addtodata(username,msg,group)
@@ -85,28 +97,35 @@ class serverobj():
                     self.messagesend(conn,self._downloadchat)
                     self.prepquerynsend(username,group,conn)
                 elif username=="Chiefcommander" and group !="h":
+                    #ensuring chief cant text in groups other than troop leaders'
                     self.messagesend(conn,'Chiefcommander can NOT send messages to troops direcctly. Sendng message to troop leaders without changing group...')
                     self.addtodata(username,msg,'h')
                 else:
+                    #simply prints in the server side
                     print(r"[{}@{}]: {}".format(username,group,msg))
+                    #adds to database and that function at the end will call another function to broadxcast the message
                     self.addtodata(username,msg,group)
                 #self.messagesend(conn , self._RECIEVEDSUCCESSFULLY) 
 
     def prepquerynsend(self, username, group, conn):
+        #sends a weeks worth of chat when download chat requested(only sends chats from current group)
         con = sqlite3.connect('messages.db')
         c = con.cursor()
         c.execute(f"SELECT user,grp,date, time, msg from chats where date > (select date('now','-7 day')) and grp like '%{group}%' order by serial")
         var = c.fetchall()
         for row in var:
             self.messagesend(conn,f"[{row[2]} {row[3]}]{row[0]}:{row[4]}\n")
+        #special message to convey end of transfer
         self.messagesend(conn,self._downloadchat)
 
     def findgrpnhange(self,username, group):
+        #finds list element based on username to change group
         for i in self.conn_list:
             if i[1]==username:
                 i[2]=group
 
     def update_all(self,group):
+        #broadcats most recent message by using conn_list
         conn = sqlite3.connect('messages.db')
         c = conn.cursor()
         c.execute(f"SELECT user,msg,time from chats where grp like '%{group}%' ORDER BY serial DESC LIMIT 1")
@@ -120,11 +139,11 @@ class serverobj():
                         self.messagesend(i[0], f"[{u[2]}]{u[0]}(me):{u[1]}")
                     else:
                         self.messagesend(i[0], f"[{u[2]}]{u[0]}:{u[1]}")
-
             except:
                 pass
+
     def sendbulk(self,conn,user,group):
-        #configure to senf only group group messages
+        #intially send the last 30 messages when anyone connects(based on the group ofc)
         conns = sqlite3.connect('messages.db')
         c=conns.cursor()
         c.execute(f"SELECT user,msg,time from (SELECT * from chats where grp like '%{group}%'ORDER BY serial DESC LIMIT 30) ORDER BY serial ASC")
@@ -136,6 +155,7 @@ class serverobj():
                 self.messagesend(conn,f"[{row[2]}]{row[0]}:{row[1]}")
 
     def messagesend(self,conn,msg):
+        #actual snippet that send the message
         message = msg.encode(self._encoding)
         msg_length = len(message)
         send_length = str(msg_length).encode(self._encoding)
@@ -144,11 +164,12 @@ class serverobj():
         conn.send(message)
 
     def getcurser(self):
+        #gets last serial nnnumber aat the beginning of program
+        #this is required because there is no auto increment in serial column in database(it was said to consume more ressourse, and i figured i might get concurrency issues)
         conn = sqlite3.connect('messages.db')
         c = conn.cursor()
         c.execute("SELECT serial from chats ORDER BY serial DESC LIMIT 1")
         s = c.fetchone()
-        
         if s:
             integ = int(s[0])
             print(f"current serial number : {integ + 1}")
@@ -159,7 +180,7 @@ class serverobj():
         conn.close()
     
     def addtodata(self,user,msg,group):
-        #implement group stuff
+        #adds recv message into the database
         conn = sqlite3.connect('messages.db')
         c = conn.cursor()
         c.execute("INSERT INTO chats VALUES (?,?,?,?,?,?)",(self.currentserialnumber,group,str(user),msg,self.gettime(),self.getdate()))
@@ -169,6 +190,7 @@ class serverobj():
         conn.close()
 
     def getdate(self):
+        #helper function for db
         conn = sqlite3.connect('messages.db')
         c = conn.cursor()
         c.execute("select date('now')")
@@ -176,6 +198,7 @@ class serverobj():
         return time[0]
 
     def gettime(self):
+        #helper fucntion for db
         conn = sqlite3.connect('messages.db')
         c = conn.cursor()
         c.execute("select time('now')")
@@ -183,6 +206,7 @@ class serverobj():
         return time[0]
 
     def assigngrp(self,username):
+        #assigns defualt group to all users based on username
         lis = ['ArmyGeneral','NavyMarshal','AirForceChief','Chiefcommander','yudeeeth','puter stop']
         if username in lis:
             return 'h'
@@ -192,7 +216,9 @@ class serverobj():
             return 'n'
         elif 'AirForce' in username:
             return 'a'
+
     def command(self, msg, username,group):
+        #checks if user is permitted the command
         lis = ['ArmyGeneral','NavyMarshal','AirForceChief','yudeeeth','puter stop']
         lis2 = [':H',':R',':N',':A',':h',':r',':n',':a']
         if username in lis:
@@ -208,6 +234,7 @@ class serverobj():
         return False
 
     def changegrp(self,msg,group,username):
+        #change group based on command
         dic = {
                 'ArmyGeneral':'r',
                 'NavyMarshal':'n',

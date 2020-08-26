@@ -45,10 +45,12 @@ Anyway. for now I ve written a script to install the right images with right nam
  > docker exec -it client /bin/bash
  then run,
  > python3.6 client.py
+ 
  voila, ssh into this container as many times as you want and it will be a different client.
  
  If you want to run the client image on your own, not the one already running,(again, why?) you can run, it make sure its connected to the same network(which it will be by default), and find the server's container ip by using 
  > docker inspect container-name 
+ 
  and pass that as an argument while calling client.py as such
  > python3.6 client.py 172.17.0.2 
 

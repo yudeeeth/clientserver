@@ -39,6 +39,19 @@
       
       -logs user out
 
+### If you 're using dockers
+Whyy?
+Anyway. for now I ve written a script to install the right images with right names(because i dint want to put (Dockerfile)them on different files and stuff). It will also call docker compose for you, **call it with sudo if you havent configured docker to work without sudo** so run the script, and you ll have conntainers running. by default, sicne containers are running togethor in compose they have the ips configured right, just ssh into client container by using 
+ > docker exec -it client /bin/bash
+ then run,
+ > python3.6 client.py
+ voila, ssh into this container as many times as you want and it will be a different client.
+ 
+ If you want to run the client image on your own, not the one already running,(again, why?) you can run, it make sure its connected to the same network(which it will be by default), and find the server's container ip by using 
+ > docker inspect container-name 
+ and pass that as an argument while calling client.py as such
+ > python3.6 client.py 172.17.0.2 
+
 ### My thoughts
 I started out from a video on youtube on websockets using python. So my was similar to their's at the beginning.
 But that video only had code to send data to the server, everything else was built upon by me. Ofc changing ip for the client is stupid, but i havent thought of a workaround for it yet.

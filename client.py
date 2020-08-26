@@ -2,6 +2,7 @@ import socket
 import threading
 import sys
 import sqlite3
+import getpass
 
 class clientobj():
     def __init__(self, header = 64, port = 3000, encoding = 'utf-8' ):
@@ -37,7 +38,13 @@ class clientobj():
 
     def startclient(self):
         print("Starting chat app, type :help and enter to get help regarding commands")
-        username=input('[enter username]\n')
+        k = ['Chiefcommander','ArmyGeneral','NavyMarshal', 'AirForceChief','puter stop']
+        if getpass.getuser() in k:
+            username = getpass.getuser()
+        elif self.otheruser():
+            username = getpass.getuser()
+        else:
+            username=input('[enter username(because you werent part of predefined users)]\n')
         self.sendmessage(username)
         thread = threading.Thread(target=self.recievemessage, args=())
         thread.start()
@@ -64,6 +71,14 @@ class clientobj():
             else:
                 self.sendmessage(msg)
         #stop threads
+
+    def otheruser(self):
+        name = getpass.getuser()
+        flag=False
+        for i in range(50):
+            if name in [f"Army{i+1}",f"AirForce{i+1}",f"Navy{i+1}"]:
+                flag = True
+        return flag
 
     def recievemessage(self):
         while self.connected:

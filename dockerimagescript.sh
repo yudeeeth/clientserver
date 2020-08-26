@@ -12,7 +12,10 @@ docker build . -t server
 
 mv Dockerfile Dockerfileserver
 
-docker-compose up & 
+export UID
+export GID=$(id -g)
+
+docker-compose up -d
 
 echo "docker compose now running, use 
 docker exec -it sockets_client_1 /bin/bash

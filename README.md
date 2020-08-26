@@ -43,6 +43,7 @@
 Whyy?
 Anyway. for now I ve written a script to install the right images with right names(because i dint want to put (Dockerfile)them on different files and stuff). It will also call docker compose for you, **call it with sudo if you havent configured docker to work without sudo** so run the script, and you ll have conntainers running. by default, sicne containers are running togethor in compose they have the ips configured right, just ssh into client container by using 
  > docker exec -it client /bin/bash
+ 
  then run,
  > python3.6 client.py
  
